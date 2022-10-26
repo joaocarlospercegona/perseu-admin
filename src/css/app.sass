@@ -1,0 +1,318 @@
+// app global css in Sass form
+
+$primary-dark: #9C1E1E
+$primary-darker: #4F0F0F
+$primary-light: #D76969
+
+.bg-primary-dark
+	background-color: $primary-dark
+
+.bg-fundo
+	background-color: grey-4
+
+.text-primary-dark
+	color: $primary-dark
+
+.bg-primary-darker
+	background-color: $primary-darker
+
+.text-primary-darker
+	color: $primary-darker
+
+.bg-primary-light
+	background-color: $primary-light
+
+.text-primary-light
+	color: $primary-light
+
+.grid-a
+	grid-area: a
+
+.grid-b
+	grid-area: b
+
+.grid-c
+	grid-area: c
+
+.grid-d
+	grid-area: d
+
+.grid-e
+	grid-area: e
+
+.grid-f
+	grid-area: f
+
+.grid-g
+	grid-area: g
+
+
+.align-center
+	display: flex
+	justify-content: center
+	align-items: center
+
+.rounded-card
+	border-radius: 20px
+
+.rounded-input > .q-field__inner > .q-field__control
+	border-radius: 4px
+	padding: 0 12px
+
+.rounded-textarea > .q-field__inner > .q-field__control > .q-field__control-container
+	padding: 0 14px
+
+.rounded
+	border-radius: 8px
+
+	
+.grid-login
+	display: grid
+	grid-template-areas: "a b" "c b" "d b"
+	grid-template-rows: 30vh 60vh 10vh
+
+@media only screen and (max-width: 900px)
+	.grid-login
+		grid-template-columns: 1fr 0fr
+    
+	.padding-page
+		padding: 12px
+    
+
+@media only screen and (min-width: 901px)
+	.grid-login
+		grid-template-columns: 4fr 8fr
+    
+	.padding-page
+		padding: 24px
+    
+
+.q-field--readonly > .q-field__inner > .q-field__control > .q-field__control-container > .q-field__native
+	cursor: default
+
+.q-field--outlined.q-field--readonly .q-field__control:before
+	border: none
+
+input[readonly]
+	cursor: default !important
+
+.q-field--readonly > .q-field__inner
+	padding: 0 12px
+	background-color: $grey-2
+	border-radius: 4px
+
+.q-field--readonly > .q-field__inner > .q-field__control::before
+	border-bottom: 0px !important
+
+.q-editor[aria-readonly="true"]
+	border: none
+
+.q-editor__content[contenteditable="false"]
+	background-color: $grey-2
+	border-radius: 4px
+
+.text-h6
+	font-weight: normal
+
+.q-field__label
+	color: var(--q-primary)
+
+.nowrap
+	white-space: nowrap
+
+.btn-responsivo
+	display: inline-block
+
+.ellipsis
+	width: 100%
+	white-space: nowrap
+	overflow: hidden
+	text-overflow: ellipsis
+
+.ellipsis-2
+	display: -webkit-box
+	-webkit-line-clamp: 2
+	-webkit-box-orient: vertical
+	overflow: hidden
+
+.input-skeleton
+	height: 100%
+
+.q-table
+	max-height: 100vh
+
+	thead tr:first-child th
+		background-color: var(--q-primary)
+		color: white
+    
+	thead tr th
+		position: sticky
+		z-index: 1
+    
+	thead tr:first-child th
+		top: 0
+    
+	&.q-table--loading thead tr:last-child th
+		top: 48px
+    
+
+.margem-erro-input
+	margin-bottom: 20px
+
+
+.img-btn
+	cursor: pointer
+	position: relative
+
+	&:after
+		content: ""
+		position: absolute
+		width: 100%
+		height: 100%
+		top: 0
+		background-color: black
+		z-index: 2
+		pointer-events: none
+		opacity: 0
+		transition: opacity 0.5s
+		will-change: opacity
+    
+
+	&:not(.visualizar):hover:after
+		opacity: 0.2
+    
+
+	&:not(.visualizar):hover .hover-expand-btn
+		border-radius: 12px
+    
+	&:not(.visualizar):hover .hover-expand-btn > span
+		max-width: calc(var(--max-width, 10) * 1rem)
+		padding: 0 10px
+    
+
+	& .hover-expand-btn
+		min-width: 40px
+		min-height: 40px
+		background-color: var(--q-primary)
+		border-radius: 100%
+		border: none
+		padding: 8px 10px
+		color: white
+		transition: border-radius 0.5s
+		will-change: border-radius
+		display: flex
+		align-items: center
+		cursor: pointer
+
+		& span
+			max-width: 0
+			transition: max-width 0.5s, padding 0.5s
+			overflow: hidden
+			white-space: nowrap
+			display: inline-block
+			will-change: max-width
+        
+
+		& i
+			font-size: 20px
+        
+.q-field--auto-height .q-field__control, .q-field--auto-height .q-field__native
+	min-height: 56px
+	max-height: 56px
+	white-space: nowrap
+	overflow: hidden
+	text-overflow: ellipsis
+
+
+.no-background
+	background: none !important
+
+.q-select.q-select--with-input input.q-field__input
+	display: none
+.q-select.q-select--with-input.q-field--focused input.q-field__input
+	display: block
+.q-page-sticky > div
+	width: 100%
+
+.q-page-sticky
+	z-index: 3
+
+i.q-icon
+	font-size: 20px
+
+.q-btn i.q-icon
+	font-size: 20px
+
+.textarea, .textarea-impressao
+	padding: 4px 12px
+	border-radius: 4px
+
+	& label
+		color: var(--q-primary)
+		font-size: 0.7rem
+		font-weight: 400
+    
+	& p
+		margin-bottom: 4px
+		margin-top: -4px
+		line-height: 20px
+    
+
+.textarea
+	background-color: $grey-2
+
+.textarea-impressao
+	border: solid 1px rgba(0,0,0,0.24)
+
+.titulo-card
+	font-size: 1.25rem
+	line-height: 1.25rem
+	font-weight: 400
+
+
+@media (max-width: 700px)
+	.btn-responsivo
+		width: 100%
+    
+
+.round-img
+	border-radius: 100%
+
+
+@media (min-width: 701px)
+	.img-paciente-small
+		width: 60px
+		height: 60px
+	.titulo-nav
+		font-size: 22px
+
+@media (max-width: 700px)
+	.img-paciente-small
+		width: 40vw
+		height: 40vw
+	.titulo-nav
+		font-size: 16px
+
+@media (max-width: 700px)
+	.container-img-paciente
+		width: 100%
+		display: flex
+		justify-content: center
+    
+
+
+.q-field__label 
+	color: var(--q-primary)
+
+.aba 
+	border-radius: 10px 10px 0px 0px
+	height: 36px
+
+.abaAtiva 
+	height: 50px
+
+.bordaSuperior 
+	border-top: 3px solid var(--q-color-grey-4)
+
+.grabbing
+	cursor: grabbing !important
