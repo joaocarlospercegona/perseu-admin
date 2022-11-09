@@ -5,17 +5,17 @@
       enter-active-class="animated fadeIn"
       leave-active-class="animated fadeOut"
     >
-      <div v-if="$route.path == '/atletas'" class="q-gutter-y-md" key="list">
+      <div v-if="$route.path == '/admins'" class="q-gutter-y-md" key="list">
         <botoes-topo-lista
-          :opcoes="{ novo: false, opcoesPadroes: false }"
+          :opcoes="{ novo: true, opcoesPadroes: false }"
           @acaoBotao="acaoBotaoTopo"
           @pesquisar="pesquisar"
         />
 
         <q-table
           class="sticky-header-table"
-          :rows="perfis"
-          :columns="perfisColumns"
+          :rows="admins"
+          :columns="adminsColumns"
           align="left"
           row-key="id"
           @request="buscar"
@@ -30,7 +30,7 @@
                 color="primary"
                 flat
                 dense
-                @click="editarAtleta(props.row.id)"
+                @click="editarAdmin(props.row.id)"
               >
                 <q-tooltip>Editar</q-tooltip>
               </q-btn>
@@ -39,7 +39,7 @@
                 color="primary"
                 flat
                 dense
-                @click="showAtleta(props.row.id)"
+                @click="showAdmin(props.row.id)"
               >
                 <q-tooltip>Mostrar</q-tooltip>
               </q-btn>
@@ -48,7 +48,7 @@
                 color="primary"
                 flat
                 dense
-                @click="removerAtleta(props.row.id)"
+                @click="removerAdmin(props.row.id)"
               >
                 <q-tooltip>Excluir</q-tooltip>
               </q-btn>
@@ -67,8 +67,8 @@ export default {
   data() {
     return {
       search: "",
-      perfis: [],
-      perfisColumns: [
+      admins: [],
+      adminsColumns: [
         {
           name: "actions",
           label: "Ações",
@@ -91,7 +91,7 @@ export default {
     acaoBotaoTopo(acao) {
       switch (acao) {
         case "novo":
-          this.$router.push("/atletas/edit");
+          this.$router.push("/admins/edit");
           break;
       }
     },
@@ -116,24 +116,24 @@ export default {
         ...this.pagination,
       };
       var response = await this.metodoExecutar({
-        url: "api/atletas/buscar",
+        url: "api/admins/buscar",
         method: "get",
         params: data,
       });
       if (response.status === 200 || response.status == 201) {
         this.pagination.rowsNumber = parseInt(response.data.length);
-        this.perfis = response.data;
+        this.admins = response.data;
       }
       this.$q.loading.hide();
     },
     adicionarCliente() {
-      this.$router.push("/atletas/edit");
+      this.$router.push("/admins/edit");
     },
-    editarAtleta(id) {
-      this.$router.push("/atletas/edit/" + id);
+    editarAdmin(id) {
+      this.$router.push("/admins/edit/" + id);
     },
 
-    removerAtleta(id) {
+    removerAdmin(id) {
       this.$q
         .dialog({
           title: "Confirmação",
@@ -144,7 +144,7 @@ export default {
         })
         .onOk(async () => {
           var response = await this.metodoExecutar({
-            url: "api/atletas/" + id + "/" + this.getUsuarioLogado.id,
+            url: "api/admins/" + id + "/" + this.getUsuarioLogado.id,
             method: "delete",
           });
           if (response.status === 200 || response.status == 201) {
@@ -156,8 +156,8 @@ export default {
           } else this.metodoRespostaErro(response);
         });
     },
-    showAtleta(id) {
-      this.$router.push("/atletas/show/" + id);
+    showAdmin(id) {
+      this.$router.push("/admins/show/" + id);
     },
   },
   async created() {

@@ -17,12 +17,12 @@
         <q-card-section>
           <div class="text-secondary text-h6 q-mb-md">
             <q-icon name="far fa-check-square" left />
-            Treinador
+            Admin
           </div>
           <div class="row q-col-gutter-sm">
             <div class="col-xs-4">
               <q-input
-                v-model="treinador.name"
+                v-model="admin.name"
                 :rules="[validadorRequerido]"
                 label="Nome*"
                 maxlength="80"
@@ -33,7 +33,7 @@
             </div>
             <div class="col-xs-4">
               <q-input
-                v-model="treinador.email"
+                v-model="admin.email"
                 :rules="[validadorRequerido]"
                 label="Email*"
                 maxlength="250"
@@ -44,7 +44,7 @@
             </div>
             <div class="col-xs-4">
               <q-input
-                v-model="treinador.password"
+                v-model="admin.password"
                 :rules="[validadorRequerido]"
                 :type="!isPwd ? 'password' : 'text'"
                 label="Senha*"
@@ -61,80 +61,6 @@
                   />
                 </template>
               </q-input>
-            </div>
-            <div class="col-xs-4">
-              <q-input
-                v-model="treinador.document"
-                :rules="[validadorRequerido]"
-                label="Documento*"
-                maxlength="80"
-                :readonly="isShow"
-                :outlined="!isShow"
-                dense
-              ></q-input>
-            </div>
-            <div class="col-xs-4">
-              <q-input
-                v-model="treinador.cref"
-                :rules="[validadorRequerido]"
-                label="CREF*"
-                maxlength="80"
-                :readonly="isShow"
-                :outlined="!isShow"
-                dense
-              ></q-input>
-            </div>
-            <div class="col-xs-4">
-              <q-input
-                label="Data de Nascimento"
-                v-model="treinador.birthdate"
-                :rules="[validadorRequerido]"
-                v-mask="'##/##/####'"
-                :outlined="!isShow"
-                dense
-                :readonly="isShow"
-              >
-                <q-btn
-                  slot="append"
-                  icon="event"
-                  color="primary"
-                  flat
-                  dense
-                  v-if="!isShow"
-                >
-                  <q-popup-proxy ref="inicio_vigencia">
-                    <q-date
-                      v-model="treinador.birthdate"
-                      mask="DD/MM/YYYY"
-                    ></q-date>
-                  </q-popup-proxy>
-                </q-btn>
-              </q-input>
-            </div>
-            <div class="col-xs-4">
-              <q-select
-                v-model="treinador.ativo"
-                hint
-                :options="simNaoOptions"
-                label="Ativo"
-                :outlined="true"
-                :readonly="isShow"
-                emit-value
-                map-options
-                dense
-              >
-                <template v-slot:prepend>
-                  <q-btn
-                    :icon="
-                      treinador.ativo ? 'fas fa-check-square' : 'far fa-square'
-                    "
-                    dense
-                    flat
-                    :disable="isShow"
-                    @click.stop="treinador.ativo = !treinador.ativo"
-                  />
-                </template>
-              </q-select>
             </div>
           </div>
         </q-card-section>
@@ -183,10 +109,11 @@ export default {
   components: { BotoesTopoEdicao },
   data() {
     return {
-      isShow: false,
       isPwd: false,
-      treinador: {
+      isShow: false,
+      admin: {
         nome: "",
+        password: "",
       },
       numeroColunas: 3,
     };
@@ -216,13 +143,13 @@ export default {
     acaoBotaoTopo(acao) {
       switch (acao) {
         case "novo":
-          this.$router.push("/treinadores/edit");
+          this.$router.push("/admins/edit");
           break;
         case "remover":
-          this.removertreinador();
+          this.removeradmin();
           break;
         case "editar":
-          this.$router.push("/treinadores/edit/" + this.treinador.id);
+          this.$router.push("/admins/edit/" + this.admin.id);
           break;
         case "salvar":
           this.$refs.form.submit();
@@ -240,24 +167,22 @@ export default {
       else if (size.width <= 800) this.numeroColunas = 1;
     },
     async onSubmit() {
-      let p = { ...this.treinador };
+      let p = { ...this.admin };
       this.$q.loading.show();
       p.usuario_id = this.getUsuarioLogado.id;
       var response = await this.metodoExecutar({
-        url:
-          "api/treinadores" +
-          (this.treinador.id ? "/" + this.treinador.id : ""),
-        method: this.treinador.id ? "put" : "post",
+        url: "api/admins" + (this.admin.id ? "/" + this.admin.id : ""),
+        method: this.admin.id ? "put" : "post",
         data: p,
       });
       if (response.status === 200 || response.status == 201) {
         let log = {
           usuario_id: this.getUsuarioLogado.id,
           data_hora: new Date(),
-          acao: this.treinador.id
-            ? "Alterando dados da treinador de Pessoa: " + this.treinador.nome
-            : "Criando a treinador de Pessoa: " + this.treinador.nome,
-          codigo: this.treinador.id ? 4 : 5,
+          acao: this.admin.id
+            ? "Alterando dados da admin de Pessoa: " + this.admin.nome
+            : "Criando a admin de Pessoa: " + this.admin.nome,
+          codigo: this.admin.id ? 4 : 5,
           alteracoes: {
             dominio: null,
             ...response.data,
@@ -265,41 +190,37 @@ export default {
         };
         this.criarLog(log);
 
-        this.$router.push("/treinadores/show/" + response.data.id);
+        this.$router.push("/admins/show/" + response.data.id);
         this.$q.notify({
-          message: "treinador salva com sucesso.",
+          message: "admin salva com sucesso.",
           type: "positive",
         });
       } else this.metodoRespostaErro(response);
       this.$q.loading.hide();
     },
     onReset() {
-      if (!this.isShow && this.treinador.id) {
-        this.$router.push("/treinadores/show/" + this.treinador.id);
+      if (!this.isShow && this.admin.id) {
+        this.$router.push("/admins/show/" + this.admin.id);
         this.isShow = true;
-      } else this.$router.push("/treinadores");
+      } else this.$router.push("/admins");
     },
-    removertreinador() {
+    removeradmin() {
       this.$q
         .dialog({
           title: "Confirmação",
           message:
-            "Você tem certeza que deseja excluir esta treinador? Essa ação é irreversível.",
+            "Você tem certeza que deseja excluir esta admin? Essa ação é irreversível.",
           ok: "Sim",
           cancel: "Não",
         })
         .onOk(async () => {
           var response = await this.metodoExecutar({
-            url:
-              "api/treinadores/" +
-              this.treinador.id +
-              "/" +
-              this.getUsuarioLogado.id,
+            url: "api/admins/" + this.admin.id + "/" + this.getUsuarioLogado.id,
             method: "delete",
           });
           if (response.status === 200 || response.status == 201) {
             this.$q.notify({
-              message: "treinador removida com sucesso.",
+              message: "admin removida com sucesso.",
               type: "positive",
             });
             this.$router.push("/categorias");
@@ -314,29 +235,29 @@ export default {
 </script>
 <style lang="sass">
 @media (min-width: 700px) and (max-width: 1000px)
-	.grid-perfil
-		display: grid
-		grid-template-areas: "a a" "b b" "d d"
-		grid-template-columns: 6fr 4fr
+ .grid-perfil
+  display: grid
+  grid-template-areas: "a a" "b b" "d d"
+  grid-template-columns: 6fr 4fr
 @media (min-width: 1001px) and (max-width: 1200px)
-	.grid-perfil
-		display: grid
-		grid-template-areas: "a a" "b b" "d d"
-		grid-template-columns: 6fr 4fr
+ .grid-perfil
+  display: grid
+  grid-template-areas: "a a" "b b" "d d"
+  grid-template-columns: 6fr 4fr
 @media (min-width: 1201px)
-	.grid-perfil
-		display: grid
-		grid-template-areas: "a a" "b b" "d d"
-		grid-template-columns: 6fr 2fr
+ .grid-perfil
+  display: grid
+  grid-template-areas: "a a" "b b" "d d"
+  grid-template-columns: 6fr 2fr
 .grid-perfil-full-width
-	grid-column-start: 1
-	grid-column-end: 3
+ grid-column-start: 1
+ grid-column-end: 3
 .circle
-	width: 24px
-	height: 24px
-	border-radius: 100%
+ width: 24px
+ height: 24px
+ border-radius: 100%
 .div-botao
-	position: absolute
-	top: 20px
-	right: 15px
+ position: absolute
+ top: 20px
+ right: 15px
 </style>

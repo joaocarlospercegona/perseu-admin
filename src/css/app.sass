@@ -4,6 +4,31 @@ $primary-dark: #9C1E1E
 $primary-darker: #4F0F0F
 $primary-light: #D76969
 
+.totalizador-grid
+	display: grid
+	grid-template-columns: 1fr 1fr
+	grid-template-rows: 6fr 4fr
+	justify-content: center
+	align-content: center
+
+.totalizador-valor
+	place-self: end end
+	font-size: 42px
+	line-height: 42px
+	color: $primary
+	font-weight: bold
+	
+.totalizador-icone
+	place-self: end start
+
+.totalizador-titulo
+	text-align: center
+	place-self: start center
+	color: $primary
+	
+.grid-2
+	grid-column: auto / span 2
+
 .bg-primary-dark
 	background-color: $primary-dark
 
