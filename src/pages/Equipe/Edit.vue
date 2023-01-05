@@ -7,7 +7,13 @@
       ref="form"
     >
       <botoes-topo-edicao
-        :opcoes="{ voltar: true, editar: true, salvar: true, remover: true }"
+        :opcoes="{
+          voltar: true,
+          editar: false,
+          salvar: false,
+          remover: false,
+          desativar: true,
+        }"
         :visualizando="isShow"
         @acaoBotao="acaoBotaoTopo"
         class="grid-a"
@@ -15,14 +21,26 @@
 
       <q-card class="grid-b">
         <q-card-section>
-          <div class="text-secondary text-h6 q-mb-md">
-            <q-icon name="far fa-check-square" left />
-            Equipe
+          <div class="row justify-between">
+            <div class="text-secondary text-h6 q-mb-md">
+              <q-icon name="far fa-check-square" left />
+              Equipe
+            </div>
+            <div>
+              <q-btn
+                icon="fas fa-arrows-alt-h"
+                no-caps
+                label="Alterar Treinador"
+                outlined
+                color="primary"
+                @click="abrirModalAlterarTreinador"
+              />
+            </div>
           </div>
           <div class="row q-col-gutter-sm">
             <div class="col-xs-6">
               <q-input
-                v-model="equipe.nome"
+                v-model="equipe.name"
                 :rules="[validadorRequerido]"
                 label="Nome*"
                 maxlength="80"
@@ -32,17 +50,13 @@
               ></q-input>
             </div>
             <div class="col-xs-6">
-              <q-select
-                v-model="equipe.treinador_id"
-                :rules="[validadorRequerido]"
+              <q-input
+                v-model="equipe.treinador"
                 label="Treinador*"
-                :options="treinadoresOptions"
-                map-options
-                option-label="nome"
                 :readonly="isShow"
                 :outlined="!isShow"
                 dense
-              ></q-select>
+              ></q-input>
             </div>
           </div>
         </q-card-section>
@@ -55,15 +69,23 @@
             Detalhes da Equipe
           </div>
           <div class="row q-col-gutter-sm">
-            <div class="col-4">
+            <div class="col-3">
               <q-input
                 v-model="equipe.quantidadeAtletas"
-                label="Quantidade de Atletas"
+                label="Atletas Aceitos"
                 :outlined="!isShow"
                 :readonly="isShow"
               />
             </div>
-            <div class="col-4">
+            <div class="col-3">
+              <q-input
+                v-model="equipe.quantidadeAtletasPendentes"
+                label="Atletas Pendentes"
+                :outlined="!isShow"
+                :readonly="isShow"
+              />
+            </div>
+            <div class="col-3">
               <q-input
                 v-model="equipe.criadaEm"
                 label="Criada Em"
@@ -71,21 +93,39 @@
                 :readonly="isShow"
               />
             </div>
-            <div class="col-4">
+            <div class="col-3">
               <q-input
-                v-model="equipe.codigo"
+                v-model="equipe.code"
                 label="Código"
                 :outlined="!isShow"
                 :readonly="isShow"
               />
             </div>
             <div class="col-12">
-              <div class="text-secondary text-h6 q-mb-md">Atletas</div>
+              <div class="text-secondary text-h6 q-mb-md">Atletas Aceitos</div>
               <q-table
                 class="sticky-header-table"
                 :rows="equipe.atletas"
                 hide-bottom
                 :columns="atletaColumns"
+                align="left"
+                row-key="id"
+                @request="buscar"
+                :rows-per-page-options="[5, 10, 25, 50, 100]"
+                :pagination-label="paginationLabel"
+                binary-state-sort
+              >
+              </q-table>
+            </div>
+            <div class="col-12">
+              <div class="text-secondary text-h6 q-mb-md">
+                Atletas Pendentes
+              </div>
+              <q-table
+                class="sticky-header-table"
+                :rows="equipe.atletasPendentes"
+                hide-bottom
+                :columns="atletaPendentesColumns"
                 align="left"
                 row-key="id"
                 @request="buscar"
@@ -130,25 +170,60 @@
         </q-card-section>
       </q-card>
     </q-form>
+    <modal-trocar-treinador ref="modalTroca" />
   </div>
 </template>
 <script>
 import moment from "moment";
+import ModalTrocarTreinador from "src/components/ModalTrocarTreinador.vue";
 import { validadorRequerido } from "src/services/validador";
 import { metodoRespostaErro } from "src/services/funcoes";
 import BotoesTopoEdicao from "src/components/BotoesTopoEdicao.vue";
 export default {
-  components: { BotoesTopoEdicao },
+  components: { BotoesTopoEdicao, ModalTrocarTreinador },
   data() {
     return {
       treinadoresOptions: [],
       atletaColumns: [
-        { name: "nome", label: "Nome", field: "nome", align: "left" },
+        {
+          name: "name",
+          label: "Nome",
+          field: "name",
+          align: "left",
+        },
         {
           name: "birthdate",
-          label: "Idade",
+          label: "Nascimento",
           field: "birthdate",
-          format: (ev) => (ev ? this.buscarIdade(ev) : ""),
+          format: (ev) => (ev ? this.formatarDataHora(ev, "DD/MM/YYYY") : ""),
+          align: "left",
+        },
+        {
+          name: "idade",
+          label: "Idade",
+          field: "idade",
+          align: "left",
+        },
+      ],
+      atletaPendentesColumns: [
+        {
+          name: "athlete",
+          label: "Nome",
+          field: "athlete",
+          format: (ev) => (ev ? ev.name : ""),
+          align: "left",
+        },
+        {
+          name: "birthdate",
+          label: "Nascimento",
+          field: "birthdate",
+          format: (ev) => (ev ? this.formatarDataHora(ev, "DD/MM/YYYY") : ""),
+          align: "left",
+        },
+        {
+          name: "idade",
+          label: "Idade",
+          field: "idade",
           align: "left",
         },
       ],
@@ -205,6 +280,9 @@ export default {
           this.$refs.form.reset();
           break;
       }
+    },
+    abrirModalAlterarTreinador() {
+      this.$refs.modalTroca.abrir(this.equipe);
     },
     buscarIdade(nascimento) {
       var age = Math.floor(
@@ -278,19 +356,51 @@ export default {
   },
   async created() {
     this.isShow = this.$route.meta.isShow;
-    return;
+
     if (this.$route.params.id !== undefined) {
       let response = await this.metodoExecutar({
         url: "team/" + this.$route.params.id,
         method: "get",
       });
-      console.log("response", response);
       if (response.status === 200 || response.status === 201) {
         response.data.criadaEm = this.formatarDataHora(
-          response.data.created_at,
+          response.data.createdAt,
           "YYYY-MM-DD",
           "DD/MM/YYYY"
         );
+        if (response.data.coach) {
+          response.data.treinador = response.data.coach.name;
+        }
+        let response2 = await this.metodoExecutar({
+          url: `team/${response.data.id}/athletes`,
+        });
+        if (response2.status == 200 || response2.status == 201) {
+          response.data.quantidadeAtletas = response2.data.length;
+          response.data.atletas = response2.data;
+        }
+        let response3 = await this.metodoExecutar({
+          url: `team/${response.data.id}/request`,
+        });
+        if (response3.status == 200 || response3.status == 201) {
+          response.data.quantidadeAtletasPendentes = response3.data.length;
+          response.data.atletasPendentes = response3.data;
+        }
+        if (response.data.atletas && response.data.atletas.length > 0)
+          for (let atleta of response.data.atletas) {
+            atleta.idade = this.buscarIdade(atleta.birthdate);
+          }
+        if (
+          response.data.atletasPendentes &&
+          response.data.atletasPendentes.length > 0
+        )
+          for (let atleta of response.data.atletasPendentes) {
+            atleta.birthdate = this.formatarDataHora(
+              atleta.athlete.birthdate,
+              "YYYY-MM-DD",
+              "DD/MM/YYYY"
+            );
+            atleta.idade = this.buscarIdade(atleta.birthdate);
+          }
         this.equipe = response.data;
       } else {
         this.$q.notify({ message: "Equipe não encontrada.", type: "negative" });

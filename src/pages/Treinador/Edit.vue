@@ -7,6 +7,12 @@
       ref="form"
     >
       <botoes-topo-edicao
+        :opcoes="{
+          voltar: true,
+          editar: false,
+          salvar: false,
+          remover: false,
+        }"
         :isShow="isShow"
         :visualizando="isShow"
         @acaoBotao="acaoBotaoTopo"
@@ -44,29 +50,10 @@
             </div>
             <div class="col-xs-4">
               <q-input
-                v-model="treinador.password"
-                :rules="[validadorRequerido]"
-                :type="!isPwd ? 'password' : 'text'"
-                label="Senha*"
-                maxlength="80"
-                :readonly="isShow"
-                :outlined="!isShow"
-                dense
-              >
-                <template v-slot:append>
-                  <q-icon
-                    :name="isPwd ? 'visibility_off' : 'visibility'"
-                    class="cursor-pointer"
-                    @click="isPwd = !isPwd"
-                  />
-                </template>
-              </q-input>
-            </div>
-            <div class="col-xs-4">
-              <q-input
                 v-model="treinador.document"
                 :rules="[validadorRequerido]"
                 label="Documento*"
+                v-mask="'###.###.###-##'"
                 maxlength="80"
                 :readonly="isShow"
                 :outlined="!isShow"
@@ -112,29 +99,14 @@
               </q-input>
             </div>
             <div class="col-xs-4">
-              <q-select
-                v-model="treinador.ativo"
-                hint
-                :options="simNaoOptions"
-                label="Ativo"
-                :outlined="true"
+              <q-input
+                v-model="treinador.team_name"
+                label="Equipe*"
+                maxlength="80"
                 :readonly="isShow"
-                emit-value
-                map-options
+                :outlined="!isShow"
                 dense
-              >
-                <template v-slot:prepend>
-                  <q-btn
-                    :icon="
-                      treinador.ativo ? 'fas fa-check-square' : 'far fa-square'
-                    "
-                    dense
-                    flat
-                    :disable="isShow"
-                    @click.stop="treinador.ativo = !treinador.ativo"
-                  />
-                </template>
-              </q-select>
+              ></q-input>
             </div>
           </div>
         </q-card-section>
@@ -227,12 +199,20 @@ export default {
         case "salvar":
           this.$refs.form.submit();
           break;
+        case "desativar":
+          this.desativarUsuario();
+          break;
+        case "ativar":
+          this.ativarUsuario();
+          break;
         case "cancelar":
         case "voltar":
           this.$refs.form.reset();
           break;
       }
     },
+    ativarUsuario() {},
+    desativarUsuario() {},
     onResize(size) {
       if (size.width > 1600) this.numeroColunas = 4;
       else if (size.width > 1100) this.numeroColunas = 3;
@@ -251,20 +231,6 @@ export default {
         data: p,
       });
       if (response.status === 200 || response.status == 201) {
-        let log = {
-          usuario_id: this.getUsuarioLogado.id,
-          data_hora: new Date(),
-          acao: this.treinador.id
-            ? "Alterando dados da treinador de Pessoa: " + this.treinador.nome
-            : "Criando a treinador de Pessoa: " + this.treinador.nome,
-          codigo: this.treinador.id ? 4 : 5,
-          alteracoes: {
-            dominio: null,
-            ...response.data,
-          },
-        };
-        this.criarLog(log);
-
         this.$router.push("/treinadores/show/" + response.data.id);
         this.$q.notify({
           message: "treinador salva com sucesso.",
@@ -309,6 +275,25 @@ export default {
   },
   async created() {
     this.isShow = this.$route.meta.isShow;
+    if (this.$route.params.id !== undefined) {
+      let response = await this.metodoExecutar({
+        url: "coach/" + this.$route.params.id,
+        method: "get",
+      });
+      if (response.status === 200 || response.status == 201) {
+        if (response.data.user) {
+          response.data.email = response.data.user.email;
+        }
+        response.data.birthdate = this.formatarDataHora(
+          response.data.birthdate,
+          "DD/MM/YYYY"
+        );
+        response.data.team_name = "";
+        if (response.data.team)
+          response.data.team_name = response.data.team.name;
+        this.treinador = { ...response.data };
+      }
+    }
   },
 };
 </script>

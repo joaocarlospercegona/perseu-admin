@@ -88,10 +88,18 @@ export default {
         method: "post",
         data: { email: this.email, password: this.password },
       });
-      console.log("response", response);
       if (response.status === 200) {
+        // if (response.data.user.type != "ADMIN") {
+        //   this.$q.notify({
+        //     message: "Usuário não autorizado.",
+        //     type: "negative",
+        //   });
+        //   this.$q.loading.hide();
+        //   return;
+        // }
         let login = {
           token: response.data.token,
+          type: "Bearer",
         };
         await this.$store.commit("setDados", { key: "login", value: login });
         await this.$store.commit("setDados", {

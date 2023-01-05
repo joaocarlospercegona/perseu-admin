@@ -15,26 +15,17 @@
         <q-table
           class="sticky-header-table"
           :rows="equipes"
-          hide-bottom
           :columns="equipeColumns"
           align="left"
           row-key="id"
           @request="buscar"
+          @update:pagination="(v) => buscar()"
           :rows-per-page-options="[5, 10, 25, 50, 100]"
           :pagination-label="paginationLabel"
           binary-state-sort
         >
           <template v-slot:body-cell-actions="props">
             <q-td :props="props">
-              <q-btn
-                icon="fas fa-edit"
-                color="primary"
-                flat
-                dense
-                @click="editarEquipe(props.row.id)"
-              >
-                <q-tooltip>Editar</q-tooltip>
-              </q-btn>
               <q-btn
                 icon="fas fa-eye"
                 color="primary"
@@ -43,15 +34,6 @@
                 @click="showEquipe(props.row.id)"
               >
                 <q-tooltip>Mostrar</q-tooltip>
-              </q-btn>
-              <q-btn
-                icon="fas fa-trash"
-                color="primary"
-                flat
-                dense
-                @click="removerEquipe(props.row.id)"
-              >
-                <q-tooltip>Excluir</q-tooltip>
               </q-btn>
             </q-td>
           </template>
@@ -68,14 +50,7 @@ export default {
   data() {
     return {
       search: "",
-      equipes: [
-        {
-          id: 1,
-          nome: "Equipe A",
-          codigo: "AHUDAS-312",
-          created_at: "2022-04-18",
-        },
-      ],
+      equipes: [],
       equipeColumns: [
         {
           name: "actions",
@@ -84,16 +59,9 @@ export default {
           align: "left",
           style: "width: 100px",
         },
-        { name: "nome", label: "Nome", field: "nome", align: "left" },
-        { name: "codigo", label: "Código", field: "codigo", align: "left" },
-        {
-          name: "created_at",
-          label: "Criada em",
-          field: "created_at",
-          align: "left",
-          format: (ev) =>
-            ev ? this.formatarDataHora(ev, "YYYY-MM-DD", "DD/MM/YYYY") : "",
-        },
+        { name: "name", label: "Nome", field: "name", align: "left" },
+        { name: "coach", label: "Treinador", field: "coach", align: "left" },
+        { name: "code", label: "Código", field: "code", align: "left" },
       ],
       pagination: {
         sortBy: "nome",
@@ -121,11 +89,22 @@ export default {
     },
     async buscar(props) {
       this.$q.loading.show();
+      if (props) {
+        this.pagination.page = props.pagination.page;
+        this.pagination.rowsPerPage = props.pagination.rowsPerPage;
+        this.pagination.sortBy = props.pagination.sortBy;
+        this.pagination.descending = props.pagination.descending;
+      }
       let data = {
         filter: this.search,
+        page: this.pagination.page,
+        pageSize: this.pagination.rowsPerPage,
+        sortBy: this.pagination.sortBy,
+        descending: this.pagination.descending,
+        ...this.pagination,
       };
       var response = await this.metodoExecutar({
-        url: "team/1",
+        url: "team",
         method: "get",
       });
       if (response.status === 200 || response.status == 201) {
@@ -177,7 +156,6 @@ export default {
     },
   },
   async created() {
-    return;
     await this.buscar();
   },
 };

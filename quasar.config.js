@@ -21,7 +21,7 @@ module.exports = configure(function (ctx) {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli-webpack/boot-files
-    boot: ["i18n", "axios", "resources", "vue-the-mask"],
+    boot: ["i18n", "axios", "resources", "vue-the-mask", "chartjs"],
 
     // https://v2.quasar.dev/quasar-cli-webpack/quasar-config-js#Property%3A-css
     css: ["app.sass"],
@@ -139,8 +139,8 @@ module.exports = configure(function (ctx) {
       chainWebpackCustomSW(/* chain */) {},
 
       manifest: {
-        name: `Quasar App`,
-        short_name: `Quasar App`,
+        name: `Perseu`,
+        short_name: `Perseu`,
         description: `A Quasar Project`,
         display: "standalone",
         orientation: "portrait",

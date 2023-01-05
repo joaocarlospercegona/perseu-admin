@@ -7,6 +7,13 @@
       ref="form"
     >
       <botoes-topo-edicao
+        :opcoes="{
+          voltar: true,
+          editar: false,
+          salvar: false,
+          remover: false,
+          desativar: true,
+        }"
         :isShow="isShow"
         :visualizando="isShow"
         @acaoBotao="acaoBotaoTopo"
@@ -23,7 +30,6 @@
             <div class="col-xs-4">
               <q-input
                 v-model="atleta.name"
-                :rules="[validadorRequerido]"
                 label="Nome*"
                 maxlength="80"
                 :readonly="isShow"
@@ -34,7 +40,6 @@
             <div class="col-xs-4">
               <q-input
                 v-model="atleta.email"
-                :rules="[validadorRequerido]"
                 label="Email*"
                 maxlength="250"
                 :readonly="isShow"
@@ -44,30 +49,10 @@
             </div>
             <div class="col-xs-4">
               <q-input
-                v-model="atleta.password"
-                :rules="[validadorRequerido]"
-                :type="!isPwd ? 'password' : 'text'"
-                label="Senha*"
-                maxlength="80"
-                :readonly="isShow"
-                :outlined="!isShow"
-                dense
-              >
-                <template v-slot:append>
-                  <q-icon
-                    :name="isPwd ? 'visibility_off' : 'visibility'"
-                    class="cursor-pointer"
-                    @click="isPwd = !isPwd"
-                  />
-                </template>
-              </q-input>
-            </div>
-            <div class="col-xs-4">
-              <q-input
                 v-model="atleta.document"
-                :rules="[validadorRequerido]"
                 label="Documento*"
                 maxlength="80"
+                v-mask="'###.###.###-##'"
                 :readonly="isShow"
                 :outlined="!isShow"
                 dense
@@ -78,7 +63,6 @@
               <q-input
                 label="Data de Nascimento"
                 v-model="atleta.birthdate"
-                :rules="[validadorRequerido]"
                 v-mask="'##/##/####'"
                 :outlined="!isShow"
                 dense
@@ -104,7 +88,6 @@
             <div class="col-xs-4">
               <q-input
                 v-model="atleta.weight"
-                :rules="[validadorRequerido]"
                 label="Peso*"
                 maxlength="80"
                 :readonly="isShow"
@@ -115,8 +98,18 @@
             <div class="col-xs-4">
               <q-input
                 v-model="atleta.height"
-                :rules="[validadorRequerido]"
+                v-mask="'#,##'"
                 label="Altura*"
+                maxlength="80"
+                :readonly="isShow"
+                :outlined="!isShow"
+                dense
+              ></q-input>
+            </div>
+            <div class="col-xs-4" v-if="atleta.status == 'ATHLETE_WITH_TEAM'">
+              <q-input
+                v-model="atleta.equipe"
+                label="Equipe*"
                 maxlength="80"
                 :readonly="isShow"
                 :outlined="!isShow"
@@ -125,7 +118,7 @@
             </div>
             <div class="col-xs-4">
               <q-select
-                v-model="atleta.ativo"
+                v-model="atleta.active"
                 hint
                 :options="simNaoOptions"
                 label="Ativo"
@@ -138,12 +131,12 @@
                 <template v-slot:prepend>
                   <q-btn
                     :icon="
-                      atleta.ativo ? 'fas fa-check-square' : 'far fa-square'
+                      atleta.active ? 'fas fa-check-square' : 'far fa-square'
                     "
                     dense
                     flat
                     :disable="isShow"
-                    @click.stop="atleta.ativo = !atleta.ativo"
+                    @click.stop="atleta.active = !atleta.active"
                   />
                 </template>
               </q-select>
@@ -239,6 +232,12 @@ export default {
         case "salvar":
           this.$refs.form.submit();
           break;
+        case "desativar":
+          this.desativarUsuario();
+          break;
+        case "ativar":
+          this.ativarUsuario();
+          break;
         case "cancelar":
         case "voltar":
           this.$refs.form.reset();
@@ -261,20 +260,6 @@ export default {
         data: p,
       });
       if (response.status === 200 || response.status == 201) {
-        let log = {
-          usuario_id: this.getUsuarioLogado.id,
-          data_hora: new Date(),
-          acao: this.atleta.id
-            ? "Alterando dados da atleta de Pessoa: " + this.atleta.nome
-            : "Criando a atleta de Pessoa: " + this.atleta.nome,
-          codigo: this.atleta.id ? 4 : 5,
-          alteracoes: {
-            dominio: null,
-            ...response.data,
-          },
-        };
-        this.criarLog(log);
-
         this.$router.push("/atletas/show/" + response.data.id);
         this.$q.notify({
           message: "atleta salva com sucesso.",
@@ -298,13 +283,42 @@ export default {
           ok: "Sim",
           cancel: "Não",
         })
-        .onOk(async () => {
-          console.log("abc");
-        });
+        .onOk(async () => {});
     },
+    ativarUsuario() {},
+    desativarUsuario() {},
   },
   async created() {
     this.isShow = this.$route.meta.isShow;
+    if (this.$route.params.id !== undefined) {
+      let response = await this.metodoExecutar({
+        url: "athlete/" + this.$route.params.id,
+        method: "get",
+      });
+      console.log("response", response);
+      if (response.status === 200 || response.status == 201) {
+        if (response.data.user) {
+          response.data.email = response.data.user.email;
+        }
+        if (response.data.deleteAt) {
+          response.data.active = false;
+        } else response.data.active = true;
+        response.data.birthdate = this.formatarDataHora(
+          response.data.birthdate,
+          "DD/MM/YYYY"
+        );
+        if (response.data.status == "ATHLETE_WITH_TEAM") {
+          let team = await this.metodoExecutar({
+            url: "athlete/" + this.$route.params.id + "/request",
+            method: "get",
+          });
+          if (team.status == 200 || team.status == 201) {
+            response.data.equipe = team.data.team.name;
+          }
+        }
+        this.atleta = { ...response.data };
+      }
+    }
   },
 };
 </script>

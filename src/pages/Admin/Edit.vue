@@ -7,6 +7,7 @@
       ref="form"
     >
       <botoes-topo-edicao
+        :opcoes="{ voltar: true, editar: false, salvar: true, remover: true }"
         :isShow="isShow"
         :visualizando="isShow"
         @acaoBotao="acaoBotaoTopo"
@@ -22,17 +23,6 @@
           <div class="row q-col-gutter-sm">
             <div class="col-xs-4">
               <q-input
-                v-model="admin.name"
-                :rules="[validadorRequerido]"
-                label="Nome*"
-                maxlength="80"
-                :readonly="isShow"
-                :outlined="!isShow"
-                dense
-              ></q-input>
-            </div>
-            <div class="col-xs-4">
-              <q-input
                 v-model="admin.email"
                 :rules="[validadorRequerido]"
                 label="Email*"
@@ -42,7 +32,7 @@
                 dense
               ></q-input>
             </div>
-            <div class="col-xs-4">
+            <div class="col-xs-4" v-if="!isShow">
               <q-input
                 v-model="admin.password"
                 :rules="[validadorRequerido]"
@@ -171,28 +161,14 @@ export default {
       this.$q.loading.show();
       p.usuario_id = this.getUsuarioLogado.id;
       var response = await this.metodoExecutar({
-        url: "api/admins" + (this.admin.id ? "/" + this.admin.id : ""),
+        url: "admin" + (this.admin.id ? "/" + this.admin.id : ""),
         method: this.admin.id ? "put" : "post",
         data: p,
       });
       if (response.status === 200 || response.status == 201) {
-        let log = {
-          usuario_id: this.getUsuarioLogado.id,
-          data_hora: new Date(),
-          acao: this.admin.id
-            ? "Alterando dados da admin de Pessoa: " + this.admin.nome
-            : "Criando a admin de Pessoa: " + this.admin.nome,
-          codigo: this.admin.id ? 4 : 5,
-          alteracoes: {
-            dominio: null,
-            ...response.data,
-          },
-        };
-        this.criarLog(log);
-
         this.$router.push("/admins/show/" + response.data.id);
         this.$q.notify({
-          message: "admin salva com sucesso.",
+          message: "admin salvo com sucesso.",
           type: "positive",
         });
       } else this.metodoRespostaErro(response);
@@ -215,21 +191,30 @@ export default {
         })
         .onOk(async () => {
           var response = await this.metodoExecutar({
-            url: "api/admins/" + this.admin.id + "/" + this.getUsuarioLogado.id,
+            url: "admin/" + this.admin.id,
             method: "delete",
           });
           if (response.status === 200 || response.status == 201) {
             this.$q.notify({
-              message: "admin removida com sucesso.",
+              message: "admin removido com sucesso.",
               type: "positive",
             });
-            this.$router.push("/categorias");
+            this.$router.push("/admins");
           } else this.metodoRespostaErro(response);
         });
     },
   },
   async created() {
     this.isShow = this.$route.meta.isShow;
+    if (this.$route.params.id !== undefined) {
+      let response = await this.metodoExecutar({
+        url: "admin/" + this.$route.params.id,
+        method: "get",
+      });
+      if (response.status === 200 || response.status == 201) {
+        this.admin = { ...response.data };
+      }
+    }
   },
 };
 </script>

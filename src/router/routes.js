@@ -6,7 +6,7 @@ const routes = [
       {
         path: "",
         component: () => import("pages/IndexPage.vue"),
-        meta: { titulo: "Dashboard" },
+        meta: { titulo: "Estatísticas" },
       },
       {
         path: "admins",

@@ -14,26 +14,20 @@
 
         <q-table
           class="sticky-header-table"
-          :rows="perfis"
-          :columns="perfisColumns"
+          :rows="atletas"
+          :columns="atletasColumns"
           align="left"
           row-key="id"
           @request="buscar"
+          @update:pagination="(v) => buscar()"
           :rows-per-page-options="[5, 10, 25, 50, 100]"
           :pagination-label="paginationLabel"
           binary-state-sort
+          :pagination.sync="pagination"
+          wrap-cells
         >
           <template v-slot:body-cell-actions="props">
             <q-td :props="props">
-              <q-btn
-                icon="fas fa-edit"
-                color="primary"
-                flat
-                dense
-                @click="editarAtleta(props.row.id)"
-              >
-                <q-tooltip>Editar</q-tooltip>
-              </q-btn>
               <q-btn
                 icon="fas fa-eye"
                 color="primary"
@@ -42,15 +36,6 @@
                 @click="showAtleta(props.row.id)"
               >
                 <q-tooltip>Mostrar</q-tooltip>
-              </q-btn>
-              <q-btn
-                icon="fas fa-trash"
-                color="primary"
-                flat
-                dense
-                @click="removerAtleta(props.row.id)"
-              >
-                <q-tooltip>Excluir</q-tooltip>
               </q-btn>
             </q-td>
           </template>
@@ -67,8 +52,8 @@ export default {
   data() {
     return {
       search: "",
-      perfis: [],
-      perfisColumns: [
+      atletas: [],
+      atletasColumns: [
         {
           name: "actions",
           label: "Ações",
@@ -76,13 +61,15 @@ export default {
           align: "left",
           style: "width: 100px",
         },
-        { name: "nome", label: "Nome", field: "nome", align: "left" },
+        { name: "name", label: "Nome", field: "name", align: "left" },
+        { name: "email", label: "Email", field: "email", align: "left" },
+        { name: "team", label: "Equipe", field: "team", align: "left" },
       ],
       pagination: {
         sortBy: "nome",
         descending: false,
         page: 1,
-        rowsPerPage: 10,
+        rowsPerPage: 5,
         rowsNumber: 0,
       },
     };
@@ -103,7 +90,6 @@ export default {
       return "Registros " + first + " até " + end + " de " + total;
     },
     async buscar(props) {
-      return;
       this.$q.loading.show();
       if (props) {
         this.pagination.page = props.pagination.page;
@@ -113,16 +99,20 @@ export default {
       }
       let data = {
         filter: this.search,
+        page: this.pagination.page,
+        pageSize: this.pagination.rowsPerPage,
+        sortBy: this.pagination.sortBy,
+        descending: this.pagination.descending,
         ...this.pagination,
       };
       var response = await this.metodoExecutar({
-        url: "api/atletas/buscar",
+        url: "user/athlete",
         method: "get",
         params: data,
       });
       if (response.status === 200 || response.status == 201) {
-        this.pagination.rowsNumber = parseInt(response.data.length);
-        this.perfis = response.data;
+        this.pagination.rowsNumber = parseInt(response.data.count);
+        this.atletas = response.data.athletes;
       }
       this.$q.loading.hide();
     },
@@ -161,7 +151,6 @@ export default {
     },
   },
   async created() {
-    return;
     await this.buscar();
   },
 };

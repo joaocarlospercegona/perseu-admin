@@ -30,7 +30,7 @@
           class="full-width text-center bg-primary q-py-xl"
           @click="$router.push('/')"
         >
-          <q-img src="images/logo.png" height="20%" width="50%" />
+          <q-img src="images/logoColorida.png" height="20%" width="50%" />
         </div>
         <q-separator />
         <q-list>
@@ -194,7 +194,6 @@ export default {
   async created() {
     if (!this.getLogin.token) this.$router.push("/login");
     else {
-      console.log("opa");
     }
     this.continuarCarregandoTela = true;
   },

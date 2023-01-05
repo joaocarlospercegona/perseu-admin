@@ -19,21 +19,13 @@
           align="left"
           row-key="id"
           @request="buscar"
+          @update:pagination="(v) => buscar()"
           :rows-per-page-options="[5, 10, 25, 50, 100]"
           :pagination-label="paginationLabel"
           binary-state-sort
         >
           <template v-slot:body-cell-actions="props">
             <q-td :props="props">
-              <q-btn
-                icon="fas fa-edit"
-                color="primary"
-                flat
-                dense
-                @click="editarAdmin(props.row.id)"
-              >
-                <q-tooltip>Editar</q-tooltip>
-              </q-btn>
               <q-btn
                 icon="fas fa-eye"
                 color="primary"
@@ -76,10 +68,10 @@ export default {
           align: "left",
           style: "width: 100px",
         },
-        { name: "nome", label: "Nome", field: "nome", align: "left" },
+        { name: "email", label: "Email", field: "email", align: "left" },
       ],
       pagination: {
-        sortBy: "nome",
+        sortBy: "email",
         descending: false,
         page: 1,
         rowsPerPage: 10,
@@ -103,7 +95,6 @@ export default {
       return "Registros " + first + " até " + end + " de " + total;
     },
     async buscar(props) {
-      return;
       this.$q.loading.show();
       if (props) {
         this.pagination.page = props.pagination.page;
@@ -113,15 +104,19 @@ export default {
       }
       let data = {
         filter: this.search,
+        page: this.pagination.page,
+        pageSize: this.pagination.rowsPerPage,
+        sortBy: this.pagination.sortBy,
+        descending: this.pagination.descending,
         ...this.pagination,
       };
       var response = await this.metodoExecutar({
-        url: "api/admins/buscar",
+        url: "user/admin",
         method: "get",
         params: data,
       });
       if (response.status === 200 || response.status == 201) {
-        this.pagination.rowsNumber = parseInt(response.data.length);
+        // this.pagination.rowsNumber = parseInt(response.data.length);
         this.admins = response.data;
       }
       this.$q.loading.hide();
@@ -133,27 +128,31 @@ export default {
       this.$router.push("/admins/edit/" + id);
     },
 
-    removerAdmin(id) {
+    async removerAdmin(id) {
       this.$q
         .dialog({
           title: "Confirmação",
           message:
-            "Tem certeza que deseja remover este Atleta? Esta ação é irreversível.",
+            "Tem certeza que deseja remover este Admin? Esta ação é irreversível.",
           ok: "Sim",
           cancel: "Não",
         })
         .onOk(async () => {
           var response = await this.metodoExecutar({
-            url: "api/admins/" + id + "/" + this.getUsuarioLogado.id,
+            url: "admin/" + id,
             method: "delete",
           });
           if (response.status === 200 || response.status == 201) {
             this.$q.notify({
-              message: "Categoria removida com sucesso",
+              message: "Admin removido com sucesso",
               type: "positive",
             });
             this.buscar();
-          } else this.metodoRespostaErro(response);
+          } else
+            this.$q.notify({
+              message: response.data.message,
+              type: "negative",
+            });
         });
     },
     showAdmin(id) {
@@ -161,7 +160,6 @@ export default {
     },
   },
   async created() {
-    return;
     await this.buscar();
   },
 };

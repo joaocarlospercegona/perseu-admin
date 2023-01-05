@@ -23,6 +23,7 @@
           align="left"
           row-key="id"
           @request="buscar"
+          @update:pagination="(v) => buscar()"
           :rows-per-page-options="[5, 10, 25, 50, 100]"
           :pagination-label="paginationLabel"
           binary-state-sort
@@ -30,31 +31,13 @@
           <template v-slot:body-cell-actions="props">
             <q-td :props="props">
               <q-btn
-                icon="fas fa-edit"
-                color="primary"
-                flat
-                dense
-                @click="editarCliente(props.row.id)"
-              >
-                <q-tooltip>Editar</q-tooltip>
-              </q-btn>
-              <q-btn
                 icon="fas fa-eye"
                 color="primary"
                 flat
                 dense
-                @click="showCliente(props.row.id)"
+                @click="showCoach(props.row.id)"
               >
                 <q-tooltip>Mostrar</q-tooltip>
-              </q-btn>
-              <q-btn
-                icon="fas fa-trash"
-                color="primary"
-                flat
-                dense
-                @click="removerCliente(props.row.id)"
-              >
-                <q-tooltip>Excluir</q-tooltip>
               </q-btn>
             </q-td>
           </template>
@@ -80,10 +63,12 @@ export default {
           align: "left",
           style: "width: 100px",
         },
-        { name: "nome", label: "Nome", field: "nome", align: "left" },
+        { name: "name", label: "Nome", field: "name", align: "left" },
+        { name: "email", label: "Email", field: "email", align: "left" },
+        { name: "team", label: "Equipe", field: "team", align: "left" },
       ],
       pagination: {
-        sortBy: "nome",
+        sortBy: "name",
         descending: false,
         page: 1,
         rowsPerPage: 10,
@@ -107,7 +92,6 @@ export default {
       return "Registros " + first + " até " + end + " de " + total;
     },
     async buscar(props) {
-      return;
       this.$q.loading.show();
       if (props) {
         this.pagination.page = props.pagination.page;
@@ -117,37 +101,31 @@ export default {
       }
       let data = {
         filter: this.search,
+        page: this.pagination.page,
+        pageSize: this.pagination.rowsPerPage,
+        sortBy: this.pagination.sortBy,
+        descending: this.pagination.descending,
         ...this.pagination,
       };
       var response = await this.metodoExecutar({
-        url: "api/treinadores/buscar",
+        url: "user/coach",
         method: "get",
         params: data,
       });
       if (response.status === 200 || response.status == 201) {
-        this.pagination.rowsNumber = parseInt(response.data.length);
-        this.perfis = response.data;
+        this.pagination.rowsNumber = parseInt(response.data.count);
+        this.perfis = response.data.coaches;
       }
       this.$q.loading.hide();
     },
     adicionarCliente() {
       this.$router.push("/treinadores/edit");
     },
-    editarCliente(id) {
+    editarCoach(id) {
       this.$router.push("/treinadores/edit/" + id);
     },
-    async criarLog(log) {
-      this.$q.loading.show();
-      var response = await this.metodoExecutar({
-        url: "api/logs/criar",
-        method: "post",
-        data: log,
-      });
-      if (response.status === 200 || response.status == 201) {
-      }
-      this.$q.loading.hide();
-    },
-    removerCliente(id) {
+
+    deleteCoach(id) {
       this.$q
         .dialog({
           title: "Confirmação",
@@ -162,17 +140,6 @@ export default {
             method: "delete",
           });
           if (response.status === 200 || response.status == 201) {
-            let log = {
-              usuario_id: this.getUsuarioLogado.id,
-              data_hora: new Date(),
-              acao: "Removendo Categoria de Pessoa " + response.data.nome,
-              codigo: 3,
-              alteracoes: {
-                dominio: null,
-                ...response.data,
-              },
-            };
-            this.criarLog(log);
             this.$q.notify({
               message: "Categoria removida com sucesso",
               type: "positive",
@@ -181,13 +148,12 @@ export default {
           } else this.metodoRespostaErro(response);
         });
     },
-    showCliente(id) {
+    showCoach(id) {
       this.$router.push("/treinadores/show/" + id);
     },
   },
   async created() {
-    console.log("fudeu");
-    //await this.buscar()
+    await this.buscar();
   },
 };
 </script>
