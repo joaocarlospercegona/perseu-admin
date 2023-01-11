@@ -96,16 +96,16 @@ export default {
         this.pagination.descending = props.pagination.descending;
       }
       let data = {
-        filter: this.search,
+        search: this.search,
         page: this.pagination.page,
         pageSize: this.pagination.rowsPerPage,
         sortBy: this.pagination.sortBy,
         descending: this.pagination.descending,
-        ...this.pagination,
       };
       var response = await this.metodoExecutar({
         url: "team",
         method: "get",
+        data: data,
       });
       if (response.status === 200 || response.status == 201) {
         this.pagination.rowsNumber = parseInt(response.data.length);
@@ -117,40 +117,7 @@ export default {
     editarEquipe(id) {
       this.$router.push("/equipes/edit/" + id);
     },
-    removerEquipe(id) {
-      this.$q
-        .dialog({
-          title: "Confirmação",
-          message:
-            "Tem certeza que deseja remover esta categoria? Esta ação é irreversível.",
-          ok: "Sim",
-          cancel: "Não",
-        })
-        .onOk(async () => {
-          var response = await this.metodoExecutar({
-            url: "api/categorias/" + id + "/" + this.getUsuarioLogado.id,
-            method: "delete",
-          });
-          if (response.status === 200 || response.status == 201) {
-            let log = {
-              usuario_id: this.getUsuarioLogado.id,
-              data_hora: new Date(),
-              acao: "Removendo Categoria de Pessoa " + response.data.nome,
-              codigo: 3,
-              alteracoes: {
-                dominio: null,
-                ...response.data,
-              },
-            };
-            this.criarLog(log);
-            this.$q.notify({
-              message: "Categoria removida com sucesso",
-              type: "positive",
-            });
-            this.buscar();
-          } else this.metodoRespostaErro(response);
-        });
-    },
+    removerEquipe(id) {},
     showEquipe(id) {
       this.$router.push("/equipes/show/" + id);
     },

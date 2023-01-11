@@ -7,7 +7,7 @@
     >
       <div v-if="$route.path == '/admins'" class="q-gutter-y-md" key="list">
         <botoes-topo-lista
-          :opcoes="{ novo: true, opcoesPadroes: false }"
+          :opcoes="{ novo: true, opcoesPadroes: false, pesquisa: false }"
           @acaoBotao="acaoBotaoTopo"
           @pesquisar="pesquisar"
         />

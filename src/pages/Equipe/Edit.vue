@@ -266,7 +266,7 @@ export default {
         case "novo":
           this.$router.push("/equipes/edit");
           break;
-        case "remover":
+        case "desativar":
           this.removerEquipe();
           break;
         case "editar":
@@ -331,7 +331,7 @@ export default {
         })
         .onOk(async () => {
           var response = await this.metodoExecutar({
-            url: "api/equipes/" + this.equipe.id,
+            url: "team/" + this.equipe.id,
             method: "delete",
           });
           if (response.status === 200 || response.status == 201) {

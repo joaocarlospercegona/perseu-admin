@@ -219,59 +219,14 @@ export default {
       else if (size.width <= 1100 && size.width > 800) this.numeroColunas = 2;
       else if (size.width <= 800) this.numeroColunas = 1;
     },
-    async onSubmit() {
-      let p = { ...this.treinador };
-      this.$q.loading.show();
-      p.usuario_id = this.getUsuarioLogado.id;
-      var response = await this.metodoExecutar({
-        url:
-          "api/treinadores" +
-          (this.treinador.id ? "/" + this.treinador.id : ""),
-        method: this.treinador.id ? "put" : "post",
-        data: p,
-      });
-      if (response.status === 200 || response.status == 201) {
-        this.$router.push("/treinadores/show/" + response.data.id);
-        this.$q.notify({
-          message: "treinador salva com sucesso.",
-          type: "positive",
-        });
-      } else this.metodoRespostaErro(response);
-      this.$q.loading.hide();
-    },
+    async onSubmit() {},
     onReset() {
       if (!this.isShow && this.treinador.id) {
         this.$router.push("/treinadores/show/" + this.treinador.id);
         this.isShow = true;
       } else this.$router.push("/treinadores");
     },
-    removertreinador() {
-      this.$q
-        .dialog({
-          title: "Confirmação",
-          message:
-            "Você tem certeza que deseja excluir esta treinador? Essa ação é irreversível.",
-          ok: "Sim",
-          cancel: "Não",
-        })
-        .onOk(async () => {
-          var response = await this.metodoExecutar({
-            url:
-              "api/treinadores/" +
-              this.treinador.id +
-              "/" +
-              this.getUsuarioLogado.id,
-            method: "delete",
-          });
-          if (response.status === 200 || response.status == 201) {
-            this.$q.notify({
-              message: "treinador removida com sucesso.",
-              type: "positive",
-            });
-            this.$router.push("/categorias");
-          } else this.metodoRespostaErro(response);
-        });
-    },
+    removertreinador() {},
   },
   async created() {
     this.isShow = this.$route.meta.isShow;

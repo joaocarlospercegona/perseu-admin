@@ -100,12 +100,11 @@ export default {
         this.pagination.descending = props.pagination.descending;
       }
       let data = {
-        filter: this.search,
+        search: this.search,
         page: this.pagination.page,
         pageSize: this.pagination.rowsPerPage,
         sortBy: this.pagination.sortBy,
         descending: this.pagination.descending,
-        ...this.pagination,
       };
       var response = await this.metodoExecutar({
         url: "user/coach",
@@ -125,29 +124,7 @@ export default {
       this.$router.push("/treinadores/edit/" + id);
     },
 
-    deleteCoach(id) {
-      this.$q
-        .dialog({
-          title: "Confirmação",
-          message:
-            "Tem certeza que deseja remover esta categoria? Esta ação é irreversível.",
-          ok: "Sim",
-          cancel: "Não",
-        })
-        .onOk(async () => {
-          var response = await this.metodoExecutar({
-            url: "api/treinadores/" + id + "/" + this.getUsuarioLogado.id,
-            method: "delete",
-          });
-          if (response.status === 200 || response.status == 201) {
-            this.$q.notify({
-              message: "Categoria removida com sucesso",
-              type: "positive",
-            });
-            this.buscar();
-          } else this.metodoRespostaErro(response);
-        });
-    },
+    deleteCoach(id) {},
     showCoach(id) {
       this.$router.push("/treinadores/show/" + id);
     },

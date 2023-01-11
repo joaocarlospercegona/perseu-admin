@@ -12,7 +12,7 @@
           editar: false,
           salvar: false,
           remover: false,
-          desativar: true,
+          desativar: this.atleta.active,
         }"
         :isShow="isShow"
         :visualizando="isShow"
@@ -233,7 +233,7 @@ export default {
           this.$refs.form.submit();
           break;
         case "desativar":
-          this.desativarUsuario();
+          this.desativarUsuario(this.atleta.id);
           break;
         case "ativar":
           this.ativarUsuario();
@@ -250,24 +250,7 @@ export default {
       else if (size.width <= 1100 && size.width > 800) this.numeroColunas = 2;
       else if (size.width <= 800) this.numeroColunas = 1;
     },
-    async onSubmit() {
-      let p = { ...this.atleta };
-      this.$q.loading.show();
-      p.usuario_id = this.getUsuarioLogado.id;
-      var response = await this.metodoExecutar({
-        url: "api/atletas" + (this.atleta.id ? "/" + this.atleta.id : ""),
-        method: this.atleta.id ? "put" : "post",
-        data: p,
-      });
-      if (response.status === 200 || response.status == 201) {
-        this.$router.push("/atletas/show/" + response.data.id);
-        this.$q.notify({
-          message: "atleta salva com sucesso.",
-          type: "positive",
-        });
-      } else this.metodoRespostaErro(response);
-      this.$q.loading.hide();
-    },
+    async onSubmit() {},
     onReset() {
       if (!this.isShow && this.atleta.id) {
         this.$router.push("/atletas/show/" + this.atleta.id);
@@ -286,7 +269,33 @@ export default {
         .onOk(async () => {});
     },
     ativarUsuario() {},
-    desativarUsuario() {},
+    desativarUsuario(id) {
+      this.$q
+        .dialog({
+          title: "Confirmação",
+          message:
+            "Tem certeza que deseja desativar este Atleta? Esta ação é irreversível.",
+          ok: "Sim",
+          cancel: "Não",
+        })
+        .onOk(async () => {
+          var response = await this.metodoExecutar({
+            url: "athlete/" + id,
+            method: "delete",
+          });
+          if (response.status === 200 || response.status == 201) {
+            this.$q.notify({
+              message: "Atleta desativado com sucesso",
+              type: "positive",
+            });
+            this.$router.push("/atletas");
+          } else
+            this.$q.notify({
+              message: response.data.message,
+              type: "negative",
+            });
+        });
+    },
   },
   async created() {
     this.isShow = this.$route.meta.isShow;
@@ -295,7 +304,6 @@ export default {
         url: "athlete/" + this.$route.params.id,
         method: "get",
       });
-      console.log("response", response);
       if (response.status === 200 || response.status == 201) {
         if (response.data.user) {
           response.data.email = response.data.user.email;

@@ -170,7 +170,7 @@ export default defineComponent({
         response.data.trainingsByTeam.length > 0
       ) {
         for (let equipe of response.data.trainingsByTeam) {
-          this.arrayEquipes.push(["" + equipe.teamId, parseInt(equipe.count)]);
+          this.arrayEquipes.push(["" + equipe.name, parseInt(equipe.count)]);
         }
       }
       if (
@@ -178,7 +178,7 @@ export default defineComponent({
         response.data.checkInsByTeam.length > 0
       ) {
         for (let equipe of response.data.checkInsByTeam) {
-          this.arrayAtletas.push(["" + equipe.teamId, parseInt(equipe.count)]);
+          this.arrayAtletas.push(["" + equipe.name, parseInt(equipe.count)]);
         }
       }
 

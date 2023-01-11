@@ -101,11 +101,6 @@ export default {
   },
   watch: {},
   methods: {
-    logoProduto(img) {
-      if (img == "nada") return "images/avatar.png";
-      //window.open(`${process.env.API_URL}api/produtos/imagem/${img}`)
-      return process.env.API_URL + "api/produtos/imagem/" + img;
-    },
     async abrir(equipe) {
       this.modalKanban = true;
       this.equipe = { ...equipe };
@@ -152,25 +147,42 @@ export default {
     },
     async alterar() {
       this.$q.loading.show();
-      let response = await this.metodoExecutar({
-        url: "updateCoach",
-        method: "put",
-        params: {
-          treinadorAntigo: this.treinadorAtual.id,
-          novoTreinador: this.newCoach.id,
-          equipe_id: this.equipe.id,
-        },
-      });
-      if (response.status === 200 || response.status == 201) {
-        this.$router.push("/equipes/show/" + this.equipe.id);
-        this.$q.notify({
-          message: "Treinador alterado com sucesso.",
-          type: "positive",
-        });
-      } else {
-        this.metodoRespostaErro(response);
-      }
-      this.modalKanban = false;
+      this.$q
+        .dialog({
+          title: "Confirmação",
+          message:
+            "Você tem certeza que deseja alterar o treinador desta equipe? Essa ação é irreversível.",
+          ok: "Sim",
+          cancel: "Não",
+        })
+        .onOk(async () => {
+          if (this.treinadorAtual.id == this.newCoach.id) {
+            this.$q.notify({
+              message: "Treinador escolhido igual o atual.",
+              type: "negative",
+            });
+          } else {
+            let response = await this.metodoExecutar({
+              url: `team/${this.equipe.id}/coach/switch`,
+              method: "put",
+              params: {
+                newCoachId: this.newCoach.id,
+              },
+            });
+            if (response.status === 200 || response.status == 201) {
+              this.$router.push("/equipes/show/" + this.equipe.id);
+              this.$q.notify({
+                message: "Treinador alterado com sucesso.",
+                type: "positive",
+              });
+            } else {
+              this.metodoRespostaErro(response);
+            }
+            this.modalKanban = false;
+          }
+        })
+        .onCancel(async () => {});
+
       this.$q.loading.hide();
     },
     async salvar() {
