@@ -53,9 +53,9 @@
           </div>
           <div class="col-6" v-if="newCoach">
             <q-input
-              v-model="newCoach.email"
+              v-model="newCoach.cref"
               :readonly="true"
-              label="Email Treinador"
+              label="Cref"
               :outlined="!isShow"
               dense
             ></q-input>
@@ -104,8 +104,9 @@ export default {
     async abrir(equipe) {
       this.modalKanban = true;
       this.equipe = { ...equipe };
+      console.log("equipe", this.equipe);
       let response = await this.metodoExecutar({
-        url: "coach/" + this.$route.params.id,
+        url: "coach/" + this.equipe.coach.id,
         method: "get",
       });
       if (response.status === 200 || response.status == 201) {
@@ -133,15 +134,16 @@ export default {
         ...this.pagination,
       };
       var response = await this.metodoExecutar({
-        url: "user/coach",
+        url: "coach/no-team",
         method: "get",
         params: data,
       });
+      console.log("response", response);
       if (
         (response.status >= 200 && response.status <= 300) ||
         response.status == 201
       ) {
-        this.treinadoresOptions = response.data.coaches;
+        this.treinadoresOptions = response.data;
       }
       if (update) update();
     },
@@ -162,15 +164,18 @@ export default {
               type: "negative",
             });
           } else {
+            let data = {
+              newCoachId: this.newCoach.id,
+            };
+            console.log("data", data);
+            console.log("equioe", this.equipe.id);
             let response = await this.metodoExecutar({
               url: `team/${this.equipe.id}/coach/switch`,
-              method: "put",
-              params: {
-                newCoachId: this.newCoach.id,
-              },
+              method: "post",
+              data: data,
             });
             if (response.status === 200 || response.status == 201) {
-              this.$router.push("/equipes/show/" + this.equipe.id);
+              this.$router.push("/equipes");
               this.$q.notify({
                 message: "Treinador alterado com sucesso.",
                 type: "positive",
