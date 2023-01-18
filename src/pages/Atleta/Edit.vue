@@ -301,7 +301,7 @@ export default {
     this.isShow = this.$route.meta.isShow;
     if (this.$route.params.id !== undefined) {
       let response = await this.metodoExecutar({
-        url: "athlete/" + this.$route.params.id,
+        url: "admin/athlete/" + this.$route.params.id,
         method: "get",
       });
       if (response.status === 200 || response.status == 201) {

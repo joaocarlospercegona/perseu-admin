@@ -89,14 +89,6 @@ export default {
         data: { email: this.email, password: this.password },
       });
       if (response.status === 200) {
-        // if (response.data.user.type != "ADMIN") {
-        //   this.$q.notify({
-        //     message: "Usuário não autorizado.",
-        //     type: "negative",
-        //   });
-        //   this.$q.loading.hide();
-        //   return;
-        // }
         let login = {
           token: response.data.token,
           type: "Bearer",
