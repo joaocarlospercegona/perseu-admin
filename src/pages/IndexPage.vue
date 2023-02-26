@@ -124,12 +124,10 @@ export default defineComponent({
       data.addRows(this.arrayAtletas);
 
       var options = {
-        width: 400,
+        width: 800,
         height: 400,
-        legend: "none",
         pieSliceText: "label",
         pieStartAngle: 100,
-        is3D: true,
       };
 
       var chart = new google.visualization.PieChart(this.$refs.graficoAtletas);
@@ -145,12 +143,10 @@ export default defineComponent({
       data.addRows(this.arrayEquipes);
 
       var options = {
-        width: 400,
+        width: 800,
         height: 400,
-        legend: "none",
         pieSliceText: "label",
         pieStartAngle: 100,
-        is3D: true,
       };
 
       var chart = new google.visualization.PieChart(this.$refs.graficoEquipes);
