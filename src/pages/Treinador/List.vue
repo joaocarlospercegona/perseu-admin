@@ -111,7 +111,6 @@ export default {
         method: "get",
         params: data,
       });
-      console.log("response", response);
       if (response.status === 200 || response.status == 201) {
         this.pagination.rowsNumber = parseInt(response.data.count);
         this.perfis = response.data.coaches;

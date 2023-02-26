@@ -104,7 +104,6 @@ export default {
     async abrir(equipe) {
       this.modalKanban = true;
       this.equipe = { ...equipe };
-      console.log("equipe", this.equipe);
       let response = await this.metodoExecutar({
         url: "coach/" + this.equipe.coach.id,
         method: "get",
@@ -138,7 +137,6 @@ export default {
         method: "get",
         params: data,
       });
-      console.log("response", response);
       if (
         (response.status >= 200 && response.status <= 300) ||
         response.status == 201
@@ -167,8 +165,6 @@ export default {
             let data = {
               newCoachId: this.newCoach.id,
             };
-            console.log("data", data);
-            console.log("equioe", this.equipe.id);
             let response = await this.metodoExecutar({
               url: `team/${this.equipe.id}/coach/switch`,
               method: "post",

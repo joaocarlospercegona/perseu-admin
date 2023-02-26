@@ -308,7 +308,7 @@ export default {
         if (response.data.user) {
           response.data.email = response.data.user.email;
         }
-        if (response.data.deleteAt) {
+        if (response.data.deletedAt) {
           response.data.active = false;
         } else response.data.active = true;
         response.data.birthdate = this.formatarDataHora(

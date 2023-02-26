@@ -62,7 +62,7 @@
     <q-card class="dashboard-grafico">
       <q-card class="fit">
         <q-card-section class="fit">
-          <div class="text-body1 text-primary">Chekins por Equipe:</div>
+          <div class="text-body1 text-primary">Check-ins por Equipe:</div>
 
           <div
             ref="graficoAtletas"
@@ -126,8 +126,10 @@ export default defineComponent({
       var options = {
         width: 400,
         height: 400,
+        legend: "none",
         pieSliceText: "label",
         pieStartAngle: 100,
+        is3D: true,
       };
 
       var chart = new google.visualization.PieChart(this.$refs.graficoAtletas);
@@ -145,8 +147,10 @@ export default defineComponent({
       var options = {
         width: 400,
         height: 400,
+        legend: "none",
         pieSliceText: "label",
         pieStartAngle: 100,
+        is3D: true,
       };
 
       var chart = new google.visualization.PieChart(this.$refs.graficoEquipes);
