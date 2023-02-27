@@ -188,6 +188,10 @@ export default defineComponent({
 
       this.carregarGraficoAtletas();
       this.carregarGraficoEquipes();
+    } else if (response.data == "Invalid token") {
+      await this.$store.commit("limparStore");
+      delete this.$axios.defaults.headers.common["Authorization"];
+      this.$route.push("/login");
     }
   },
 });
