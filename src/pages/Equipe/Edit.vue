@@ -217,7 +217,6 @@ export default {
           name: "birthdate",
           label: "Nascimento",
           field: "birthdate",
-          format: (ev) => (ev ? this.formatarDataHora(ev, "DD/MM/YYYY") : ""),
           align: "left",
         },
         {
@@ -394,12 +393,13 @@ export default {
           response.data.atletasPendentes.length > 0
         )
           for (let atleta of response.data.atletasPendentes) {
+            console.log("atleta", atleta);
             atleta.birthdate = this.formatarDataHora(
               atleta.athlete.birthdate,
               "YYYY-MM-DD",
               "DD/MM/YYYY"
             );
-            atleta.idade = this.buscarIdade(atleta.birthdate);
+            atleta.idade = this.buscarIdade(atleta.athlete.birthdate);
           }
         this.equipe = response.data;
       } else {
