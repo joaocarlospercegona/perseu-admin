@@ -393,7 +393,6 @@ export default {
           response.data.atletasPendentes.length > 0
         )
           for (let atleta of response.data.atletasPendentes) {
-            console.log("atleta", atleta);
             atleta.birthdate = this.formatarDataHora(
               atleta.athlete.birthdate,
               "YYYY-MM-DD",
