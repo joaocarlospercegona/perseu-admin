@@ -90,12 +90,13 @@
   </div>
 </template>
 <script>
+import AdminController from "src/Controller/AdminController";
 import { simNaoOptions } from "src/services/funcoesMixin";
 import { validadorRequerido } from "src/services/validador";
 import { metodoRespostaErro } from "src/services/funcoes";
 import BotoesTopoEdicao from "src/components/BotoesTopoEdicao.vue";
 export default {
-  mixins: [simNaoOptions],
+  mixins: [simNaoOptions, AdminController],
   components: { BotoesTopoEdicao },
   data() {
     return {
@@ -190,30 +191,15 @@ export default {
           cancel: "Não",
         })
         .onOk(async () => {
-          var response = await this.metodoExecutar({
-            url: "admin/" + this.admin.id,
-            method: "delete",
-          });
-          if (response.status === 200 || response.status == 201) {
-            this.$q.notify({
-              message: "admin removido com sucesso.",
-              type: "positive",
-            });
-            this.$router.push("/admins");
-          } else this.metodoRespostaErro(response);
+          await this.excluirAdmin(this.admin.id);
+          this.$router.push("/admins");
         });
     },
   },
   async created() {
     this.isShow = this.$route.meta.isShow;
     if (this.$route.params.id !== undefined) {
-      let response = await this.metodoExecutar({
-        url: "admin/" + this.$route.params.id,
-        method: "get",
-      });
-      if (response.status === 200 || response.status == 201) {
-        this.admin = { ...response.data };
-      }
+      this.admin = await this.buscarAdmin(this.$route.params.id);
     }
   },
 };

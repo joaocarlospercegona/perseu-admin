@@ -179,12 +179,13 @@
   </div>
 </template>
 <script>
+import AtletaController from "src/Controller/AtletaController";
 import { simNaoOptions } from "src/services/funcoesMixin";
 import { validadorRequerido } from "src/services/validador";
 import { metodoRespostaErro } from "src/services/funcoes";
 import BotoesTopoEdicao from "src/components/BotoesTopoEdicao.vue";
 export default {
-  mixins: [simNaoOptions],
+  mixins: [simNaoOptions, AtletaController],
   components: { BotoesTopoEdicao },
   data() {
     return {
@@ -279,53 +280,14 @@ export default {
           cancel: "Não",
         })
         .onOk(async () => {
-          var response = await this.metodoExecutar({
-            url: "athlete/" + id,
-            method: "delete",
-          });
-          if (response.status === 200 || response.status == 201) {
-            this.$q.notify({
-              message: "Atleta desativado com sucesso",
-              type: "positive",
-            });
-            this.$router.push("/atletas");
-          } else
-            this.$q.notify({
-              message: response.data.message,
-              type: "negative",
-            });
+          await this.desativarAtleta(id);
         });
     },
   },
   async created() {
     this.isShow = this.$route.meta.isShow;
     if (this.$route.params.id !== undefined) {
-      let response = await this.metodoExecutar({
-        url: "admin/athlete/" + this.$route.params.id,
-        method: "get",
-      });
-      if (response.status === 200 || response.status == 201) {
-        if (response.data.user) {
-          response.data.email = response.data.user.email;
-        }
-        if (response.data.deletedAt) {
-          response.data.active = false;
-        } else response.data.active = true;
-        response.data.birthdate = this.formatarDataHora(
-          response.data.birthdate,
-          "DD/MM/YYYY"
-        );
-        if (response.data.status == "ATHLETE_WITH_TEAM") {
-          let team = await this.metodoExecutar({
-            url: "athlete/" + this.$route.params.id + "/request",
-            method: "get",
-          });
-          if (team.status == 200 || team.status == 201) {
-            response.data.equipe = team.data.team.name;
-          }
-        }
-        this.atleta = { ...response.data };
-      }
+      this.atleta = await this.buscarAtleta(this.$route.params.id);
     }
   },
 };

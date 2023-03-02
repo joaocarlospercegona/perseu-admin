@@ -73,6 +73,7 @@
   </q-page>
 </template>
 <script>
+import { efetuarLogout } from "src/services/funcoes";
 export default {
   data() {
     return {
@@ -81,6 +82,7 @@ export default {
     };
   },
   methods: {
+    efetuarLogout,
     async onSubmit() {
       this.$q.loading.show();
       var response = await this.metodoExecutar({
@@ -107,7 +109,6 @@ export default {
     this.$refs.email.focus();
   },
   async created() {
-    return;
     if (this.$route.path === "/logout") await this.efetuarLogout();
     else if (!this.isBlank(this.getLogin.token)) this.$router.push("/");
   },

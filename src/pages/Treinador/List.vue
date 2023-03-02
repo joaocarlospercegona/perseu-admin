@@ -48,8 +48,10 @@
   </q-page>
 </template>
 <script>
+import TreinadorController from "src/Controller/TreinadorController";
 import BotoesTopoLista from "src/components/BotoesTopoLista.vue";
 export default {
+  mixins: [TreinadorController],
   components: { BotoesTopoLista },
   data() {
     return {
@@ -106,15 +108,7 @@ export default {
         sortBy: this.pagination.sortBy,
         descending: this.pagination.descending,
       };
-      var response = await this.metodoExecutar({
-        url: "user/coach",
-        method: "get",
-        params: data,
-      });
-      if (response.status === 200 || response.status == 201) {
-        this.pagination.rowsNumber = parseInt(response.data.count);
-        this.perfis = response.data.coaches;
-      }
+      this.perfis = await this.buscarTreinadores(data);
       this.$q.loading.hide();
     },
     adicionarCliente() {

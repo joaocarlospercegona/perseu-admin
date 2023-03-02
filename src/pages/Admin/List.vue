@@ -53,9 +53,11 @@
   </q-page>
 </template>
 <script>
+import AdminController from "src/Controller/AdminController";
 import BotoesTopoLista from "src/components/BotoesTopoLista.vue";
 export default {
   components: { BotoesTopoLista },
+  mixins: [AdminController],
   data() {
     return {
       search: "",
@@ -110,15 +112,7 @@ export default {
         descending: this.pagination.descending,
         ...this.pagination,
       };
-      var response = await this.metodoExecutar({
-        url: "user/admin",
-        method: "get",
-        params: data,
-      });
-      if (response.status === 200 || response.status == 201) {
-        // this.pagination.rowsNumber = parseInt(response.data.length);
-        this.admins = response.data;
-      }
+      this.admins = await this.buscarAdmins(data);
       this.$q.loading.hide();
     },
     adicionarCliente() {
@@ -138,21 +132,8 @@ export default {
           cancel: "Não",
         })
         .onOk(async () => {
-          var response = await this.metodoExecutar({
-            url: "admin/" + id,
-            method: "delete",
-          });
-          if (response.status === 200 || response.status == 201) {
-            this.$q.notify({
-              message: "Admin removido com sucesso",
-              type: "positive",
-            });
-            this.buscar();
-          } else
-            this.$q.notify({
-              message: response.data.message,
-              type: "negative",
-            });
+          await this.excluirAdmin(id);
+          this.buscar();
         });
     },
     showAdmin(id) {

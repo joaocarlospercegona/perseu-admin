@@ -44,9 +44,11 @@
   </q-page>
 </template>
 <script>
+import EquipeController from "src/Controller/EquipeController";
 import BotoesTopoLista from "src/components/BotoesTopoLista.vue";
 export default {
   components: { BotoesTopoLista },
+  mixins: [EquipeController],
   data() {
     return {
       search: "",
@@ -102,15 +104,8 @@ export default {
         sortBy: this.pagination.sortBy,
         descending: this.pagination.descending,
       };
-      var response = await this.metodoExecutar({
-        url: "team",
-        method: "get",
-        data: data,
-      });
-      if (response.status === 200 || response.status == 201) {
-        this.pagination.rowsNumber = parseInt(response.data.length);
-        this.equipes = response.data;
-      }
+      this.equipes = await this.buscarEquipes(data);
+
       this.$q.loading.hide();
     },
 

@@ -46,9 +46,11 @@
   </q-page>
 </template>
 <script>
+import AtletaController from "src/Controller/AtletaController";
 import BotoesTopoLista from "src/components/BotoesTopoLista.vue";
 export default {
   components: { BotoesTopoLista },
+  mixins: [AtletaController],
   data() {
     return {
       search: "",
@@ -105,15 +107,8 @@ export default {
         descending: this.pagination.descending,
         ...this.pagination,
       };
-      var response = await this.metodoExecutar({
-        url: "user/athlete",
-        method: "get",
-        params: data,
-      });
-      if (response.status === 200 || response.status == 201) {
-        this.pagination.rowsNumber = parseInt(response.data.count);
-        this.atletas = response.data.athletes;
-      }
+      this.atletas = await this.buscarAtletas(data);
+
       this.$q.loading.hide();
     },
     adicionarCliente() {

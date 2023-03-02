@@ -146,12 +146,13 @@
   </div>
 </template>
 <script>
+import TreinadorController from "src/Controller/TreinadorController";
 import { simNaoOptions } from "src/services/funcoesMixin";
 import { validadorRequerido } from "src/services/validador";
 import { metodoRespostaErro } from "src/services/funcoes";
 import BotoesTopoEdicao from "src/components/BotoesTopoEdicao.vue";
 export default {
-  mixins: [simNaoOptions],
+  mixins: [simNaoOptions, TreinadorController],
   components: { BotoesTopoEdicao },
   data() {
     return {
@@ -231,23 +232,7 @@ export default {
   async created() {
     this.isShow = this.$route.meta.isShow;
     if (this.$route.params.id !== undefined) {
-      let response = await this.metodoExecutar({
-        url: "coach/" + this.$route.params.id,
-        method: "get",
-      });
-      if (response.status === 200 || response.status == 201) {
-        if (response.data.user) {
-          response.data.email = response.data.user.email;
-        }
-        response.data.birthdate = this.formatarDataHora(
-          response.data.birthdate,
-          "DD/MM/YYYY"
-        );
-        response.data.team_name = "";
-        if (response.data.team)
-          response.data.team_name = response.data.team.name;
-        this.treinador = { ...response.data };
-      }
+      this.treinador = await this.buscarTreinador(this.$route.params.id);
     }
   },
 };
